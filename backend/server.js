@@ -24,7 +24,6 @@ app.use('/api/auth', require('./routes/authRoutes'));
 app.use('/api/student', require('./routes/studentRoutes'));
 app.use('/api/faculty', require('./routes/facultyRoutes'));
 app.use('/api/admin', require('./routes/adminRoutes'));
-app.use('/api/qr', require('./routes/qrRoutes'));
 
 // Basic Health Check Route
 app.get('/', (req, res) => {

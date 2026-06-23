@@ -378,60 +378,7 @@ const getStudentAIRecommendations = async (req, res) => {
   }
 };
 
-// @desc    Mock Chatbot for AI Recommendations
-// @route   POST /api/student/ai-chat
-// @access  Private (Student)
-const chatWithAI = async (req, res) => {
-  try {
-    const { message } = req.body;
-    const studentId = req.user._id;
 
-    if (!message) {
-      return res.status(400).json({ success: false, message: 'Please provide a message' });
-    }
-
-    // Fetch student's grades to ground the chatbot's answers in reality
-    const grades = await Grade.find({ student: studentId }).populate('course', 'name code');
-    const student = await User.findById(studentId);
-
-    const weakCourses = grades.filter(g => g.marksObtained / g.maxMarks < 0.75).map(g => g.course.name);
-    const gradesSummary = grades.map(g => `${g.course.name} (${g.grade})`).join(', ');
-
-    // Mock chatbot logic based on keywords
-    let responseText = `Hello ${student.name}. I am your AI Academic Advisor. `;
-    
-    const msgLower = message.toLowerCase();
-
-    if (msgLower.includes('improve') || msgLower.includes('grade') || msgLower.includes('score')) {
-      if (weakCourses.length > 0) {
-        responseText += `I see that you currently have lower scores in ${weakCourses.join(', ')}. To improve, try: 1) Downloading resources uploaded by your instructors, 2) Practicing mock exercises daily, and 3) Requesting a study guide. For ${weakCourses[0]}, let's schedule 45 minutes of revision every alternate day.`;
-      } else {
-        responseText += `Your grades look fantastic (${gradesSummary || 'No grades logged yet'}). To keep improving, challenge yourself with advanced projects, peer tutoring, and internship applications listed in the Placement section!`;
-      }
-    } else if (msgLower.includes('resume') || msgLower.includes('placement') || msgLower.includes('job')) {
-      responseText += `To prepare for placements, go to the 'Resume Builder' tab in your panel. It will compile your projects, experience, and skills into a professional layout. I also recommend checking the 'Internships & Placements' section where companies have posted job openings.`;
-    } else if (msgLower.includes('attendance')) {
-      const lowAttendance = await calculateAttendanceStats(studentId, await Course.find({ students: studentId }));
-      const lowAttCourses = lowAttendance.filter(c => c.percentage < 75).map(c => c.courseName);
-      if (lowAttCourses.length > 0) {
-        responseText += `Your attendance is below the 75% requirement in: ${lowAttCourses.join(', ')}. Please attend the upcoming sessions to avoid academic penalties.`;
-      } else {
-        responseText += `Great job! Your attendance is above the 75% threshold in all classes. Keep attending regularly!`;
-      }
-    } else {
-      responseText += `Based on your academic profile, your average performance is solid. If you need help with study schedules, project ideas, or homework tips for any of your courses (${grades.map(g => g.course.code).join(', ') || 'No registered courses'}), just ask!`;
-    }
-
-    res.json({
-      success: true,
-      data: {
-        reply: responseText
-      }
-    });
-  } catch (error) {
-    res.status(500).json({ success: false, message: error.message });
-  }
-};
 
 // @desc    Get Placement & Internship Listings
 // @route   GET /api/student/jobs
@@ -496,6 +443,54 @@ const applyForJob = async (req, res) => {
   }
 };
 
+// @desc    Self mark attendance for today
+// @route   POST /api/student/attendance/self
+// @access  Private (Student)
+const selfMarkAttendance = async (req, res) => {
+  try {
+    const studentId = req.user._id;
+    const { courseId } = req.body;
+
+    if (!courseId) {
+      return res.status(400).json({ success: false, message: 'Course ID is required' });
+    }
+
+    const today = new Date();
+    today.setUTCHours(0, 0, 0, 0);
+
+    const attendanceExists = await Attendance.findOne({
+      student: studentId,
+      course: courseId,
+      date: today
+    });
+
+    if (attendanceExists) {
+      return res.status(400).json({ success: false, message: 'Attendance already marked for today' });
+    }
+
+    const course = await Course.findById(courseId);
+    if (!course) {
+      return res.status(404).json({ success: false, message: 'Course not found' });
+    }
+
+    const attendance = await Attendance.create({
+      student: studentId,
+      course: courseId,
+      date: today,
+      status: 'Present',
+      markedBy: course.faculty
+    });
+
+    res.status(201).json({
+      success: true,
+      message: `Attendance marked present for course ${course.name} successfully!`,
+      data: attendance
+    });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
 module.exports = {
   getStudentDashboard,
   getStudentAttendance,
@@ -505,7 +500,7 @@ module.exports = {
   getStudentAssignments,
   submitAssignment,
   getStudentAIRecommendations,
-  chatWithAI,
   getStudentJobs,
-  applyForJob
+  applyForJob,
+  selfMarkAttendance
 };

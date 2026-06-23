@@ -1,20 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { 
-  BarChart, 
-  Bar, 
-  XAxis, 
-  YAxis, 
-  CartesianGrid, 
-  Tooltip, 
-  ResponsiveContainer 
-} from 'recharts';
-import { 
   CalendarDays, 
   ClipboardCheck, 
   AlertTriangle, 
   Megaphone, 
-  FileText, 
   CheckCircle, 
   Clock 
 } from 'lucide-react';
@@ -54,19 +44,13 @@ const StudentDashboard = () => {
 
   if (error) {
     return (
-      <div className="rounded-2xl bg-rose-500/10 border border-rose-500/20 p-6 text-sm font-semibold text-rose-600 dark:text-rose-400">
+      <div className="rounded-2xl bg-rose-500/10 border border-rose-500/20 p-6 text-sm font-semibold text-rose-600 dark:text-rose-455">
         {error}
       </div>
     );
   }
 
   const { overallAttendance, attendanceStats, recentGrades, assignmentStats, todayTimetable, announcements } = data;
-
-  // Chart data formatting
-  const chartData = attendanceStats.map(item => ({
-    name: item.courseCode,
-    attendance: item.percentage
-  }));
 
   return (
     <div className="space-y-8 animate-fade-in">
@@ -80,15 +64,15 @@ const StudentDashboard = () => {
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         
         {/* Attendance circular widget */}
-        <div className="glass-panel rounded-3xl p-6 flex items-center justify-between shadow-sm">
+        <div className="glass-panel rounded-3xl p-6 flex items-center justify-between shadow-sm border border-slate-200/40 dark:border-slate-850">
           <div>
-            <h3 className="text-sm font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Overall Attendance</h3>
+            <h3 className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Overall Attendance</h3>
             <span className="text-4xl font-extrabold text-slate-800 dark:text-slate-100 mt-2 block">
               {overallAttendance}%
             </span>
             <div className="mt-2.5">
               {overallAttendance < 75 ? (
-                <span className="inline-flex items-center gap-1 rounded-lg bg-amber-500/10 text-amber-600 px-2 py-0.5 text-xs font-semibold">
+                <span className="inline-flex items-center gap-1 rounded-lg bg-rose-500/10 text-rose-600 px-2 py-0.5 text-xs font-semibold">
                   <AlertTriangle className="h-3 w-3" />
                   Below threshold (75%)
                 </span>
@@ -108,7 +92,7 @@ const StudentDashboard = () => {
                 cx="40" 
                 cy="40" 
                 r="34" 
-                className={`fill-none transition-all duration-500 ${overallAttendance < 75 ? 'stroke-amber-500' : 'stroke-indigo-600'}`} 
+                className={`fill-none transition-all duration-500 ${overallAttendance < 75 ? 'stroke-rose-500' : 'stroke-indigo-650 stroke-indigo-600'}`} 
                 strokeWidth="6" 
                 strokeDasharray={`${2 * Math.PI * 34}`}
                 strokeDashoffset={`${2 * Math.PI * 34 * (1 - overallAttendance / 100)}`}
@@ -121,10 +105,10 @@ const StudentDashboard = () => {
         </div>
 
         {/* Assignments KPI card */}
-        <div className="glass-panel rounded-3xl p-6 shadow-sm">
+        <div className="glass-panel rounded-3xl p-6 shadow-sm border border-slate-200/40 dark:border-slate-850">
           <div className="flex items-center justify-between">
             <div>
-              <h3 className="text-sm font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Assignments</h3>
+              <h3 className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Assignments</h3>
               <span className="text-4xl font-extrabold text-slate-800 dark:text-slate-100 mt-2 block">
                 {assignmentStats.completed}/{assignmentStats.total}
               </span>
@@ -148,9 +132,9 @@ const StudentDashboard = () => {
         </div>
 
         {/* Timetable KPI card */}
-        <div className="glass-panel rounded-3xl p-6 flex justify-between shadow-sm">
+        <div className="glass-panel rounded-3xl p-6 flex justify-between shadow-sm border border-slate-200/40 dark:border-slate-850">
           <div>
-            <h3 className="text-sm font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Today's Lectures</h3>
+            <h3 className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Today's Lectures</h3>
             <span className="text-4xl font-extrabold text-slate-800 dark:text-slate-100 mt-2 block">
               {todayTimetable.length} Slots
             </span>
@@ -163,43 +147,47 @@ const StudentDashboard = () => {
 
       </div>
 
-      {/* Main Charts & Timelines Grid */}
+      {/* Main Lists Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         
-        {/* Attendance chart */}
+        {/* Subject-wise progress stats & recent grades */}
         <div className="lg:col-span-2 space-y-8">
-          <div className="glass-panel rounded-3xl p-6 shadow-sm">
-            <h3 className="text-lg font-bold text-slate-800 dark:text-slate-200 mb-6">Subject Attendance (%)</h3>
-            <div className="h-64">
-              <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={chartData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
-                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="rgba(200,200,200,0.1)" />
-                  <XAxis dataKey="name" stroke="#94a3b8" fontSize={11} tickLine={false} />
-                  <YAxis domain={[0, 100]} stroke="#94a3b8" fontSize={11} tickLine={false} />
-                  <Tooltip 
-                    contentStyle={{ 
-                      borderRadius: '12px', 
-                      background: 'rgba(30, 41, 59, 0.9)', 
-                      border: '0', 
-                      color: '#f8fafc',
-                      fontSize: '12px'
-                    }} 
-                  />
-                  <Bar dataKey="attendance" fill="#6366f1" radius={[8, 8, 0, 0]} barSize={36} />
-                </BarChart>
-              </ResponsiveContainer>
+          
+          {/* Subject progress bar charts */}
+          <div className="glass-panel rounded-3xl p-6 shadow-sm border border-slate-200/40 dark:border-slate-850">
+            <h3 className="text-lg font-bold text-slate-800 dark:text-slate-200 mb-6">Subject Attendance Summary</h3>
+            <div className="space-y-4">
+              {attendanceStats.map((item) => (
+                <div key={item.courseId} className="space-y-1.5">
+                  <div className="flex justify-between text-xs font-semibold">
+                    <span className="text-slate-700 dark:text-slate-300">{item.courseName} ({item.courseCode})</span>
+                    <span className={`${item.percentage < 75 ? 'text-rose-500' : 'text-indigo-650 dark:text-indigo-400'}`}>{item.percentage}%</span>
+                  </div>
+                  <div className="h-3 w-full bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
+                    <div 
+                      className={`h-full rounded-full transition-all duration-350 ${
+                        item.percentage < 75 ? 'bg-rose-500' : 'bg-indigo-600'
+                      }`}
+                      style={{ width: `${item.percentage}%` }}
+                    />
+                  </div>
+                </div>
+              ))}
+              {attendanceStats.length === 0 && (
+                <p className="text-xs text-slate-400 py-6 text-center">No enrolled courses logged.</p>
+              )}
             </div>
           </div>
 
           {/* Recent Grades table */}
-          <div className="glass-panel rounded-3xl p-6 shadow-sm">
+          <div className="glass-panel rounded-3xl p-6 shadow-sm border border-slate-200/40 dark:border-slate-850">
             <h3 className="text-lg font-bold text-slate-800 dark:text-slate-200 mb-4">Recent Graded Components</h3>
             <div className="overflow-x-auto">
               <table className="w-full text-left text-sm">
                 <thead>
                   <tr className="border-b border-slate-100 dark:border-slate-850 text-xs font-bold text-slate-400 uppercase">
                     <th className="py-3">Course</th>
-                    <th className="py-3">Exam / Type</th>
+                    <th className="py-3">Evaluation Type</th>
                     <th className="py-3">Score</th>
                     <th className="py-3 text-right">Grade</th>
                   </tr>
@@ -207,14 +195,14 @@ const StudentDashboard = () => {
                 <tbody className="divide-y divide-slate-100/50 dark:divide-slate-800/30">
                   {recentGrades.map((g) => (
                     <tr key={g._id} className="hover:bg-slate-50/50 dark:hover:bg-slate-900/20">
-                      <td className="py-3 font-semibold text-slate-800 dark:text-slate-300">
+                      <td className="py-3.5 font-semibold text-slate-805 dark:text-slate-300">
                         {g.course.name}
                       </td>
-                      <td className="py-3 text-slate-500 dark:text-slate-400">{g.examType}</td>
-                      <td className="py-3 font-mono font-medium text-slate-600 dark:text-slate-400">
+                      <td className="py-3.5 text-slate-500 dark:text-slate-400">{g.examType}</td>
+                      <td className="py-3.5 font-mono font-medium text-slate-600 dark:text-slate-400">
                         {g.marksObtained}/{g.maxMarks}
                       </td>
-                      <td className="py-3 text-right">
+                      <td className="py-3.5 text-right">
                         <span className={`inline-flex rounded-lg px-2.5 py-0.5 text-xs font-extrabold ${
                           g.grade === 'A+' || g.grade === 'A' ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400' :
                           g.grade === 'B+' || g.grade === 'B' ? 'bg-blue-500/10 text-blue-600' : 'bg-rose-500/10 text-rose-600'
@@ -239,7 +227,7 @@ const StudentDashboard = () => {
         <div className="lg:col-span-1 space-y-8">
           
           {/* Today's Timetable Timeline */}
-          <div className="glass-panel rounded-3xl p-6 shadow-sm">
+          <div className="glass-panel rounded-3xl p-6 shadow-sm border border-slate-200/40 dark:border-slate-850">
             <h3 className="text-lg font-bold text-slate-800 dark:text-slate-200 mb-5 flex items-center gap-2">
               <Clock className="h-5 w-5 text-indigo-500" />
               Today's Classes
@@ -248,11 +236,11 @@ const StudentDashboard = () => {
               {todayTimetable.map((slot) => (
                 <div key={slot._id} className="flex gap-4 border-l-2 border-indigo-500/50 pl-4 py-1">
                   <div>
-                    <span className="text-xs font-extrabold text-indigo-600 dark:text-indigo-400 font-mono block">
+                    <span className="text-xs font-extrabold text-indigo-650 dark:text-indigo-400 font-mono block">
                       {slot.startTime} - {slot.endTime}
                     </span>
-                    <h4 className="text-sm font-bold text-slate-800 dark:text-slate-250 mt-0.5">{slot.course.name}</h4>
-                    <span className="text-xs text-slate-400 font-medium">Room: {slot.room}</span>
+                    <h4 className="text-xs font-bold text-slate-800 dark:text-slate-250 mt-0.5">{slot.course.name}</h4>
+                    <span className="text-[10px] text-slate-400 font-medium">Room: {slot.room}</span>
                   </div>
                 </div>
               ))}
@@ -263,7 +251,7 @@ const StudentDashboard = () => {
           </div>
 
           {/* Announcements feed */}
-          <div className="glass-panel rounded-3xl p-6 shadow-sm">
+          <div className="glass-panel rounded-3xl p-6 shadow-sm border border-slate-200/40 dark:border-slate-850">
             <h3 className="text-lg font-bold text-slate-800 dark:text-slate-200 mb-5 flex items-center gap-2">
               <Megaphone className="h-5 w-5 text-indigo-500" />
               Notices Board
@@ -283,7 +271,7 @@ const StudentDashboard = () => {
                       {new Date(ann.createdAt).toLocaleDateString()}
                     </span>
                   </div>
-                  <h4 className="text-xs font-bold text-slate-800 dark:text-slate-200 mt-2">{ann.title}</h4>
+                  <h4 className="text-xs font-bold text-slate-850 dark:text-slate-200 mt-2">{ann.title}</h4>
                   <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-1 leading-relaxed">{ann.content}</p>
                 </div>
               ))}

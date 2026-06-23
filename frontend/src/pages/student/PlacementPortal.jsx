@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../../context/AuthContext';
-import { Briefcase, MapPin, DollarSign, Calendar, Search, Award, CheckCircle2, Loader2 } from 'lucide-react';
+import { Briefcase, MapPin, DollarSign, Calendar, Search, CheckCircle2, Loader2 } from 'lucide-react';
 
 const PlacementPortal = () => {
-  const { fetchWithAuth, user } = useAuth();
+  const { fetchWithAuth } = useAuth();
   const [jobs, setJobs] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -82,7 +82,7 @@ const PlacementPortal = () => {
       </div>
 
       {error && (
-        <div className="rounded-2xl bg-rose-500/10 border border-rose-500/20 p-4 text-sm font-semibold text-rose-600 dark:text-rose-400">
+        <div className="rounded-2xl bg-rose-500/10 border border-rose-500/20 p-4 text-sm font-semibold text-rose-600 dark:text-rose-450">
           {error}
         </div>
       )}
@@ -90,14 +90,10 @@ const PlacementPortal = () => {
       {/* Opportunities cards list */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {filteredJobs.map((job) => {
-          const matchedSkills = job.requirements.filter(reqSkill => 
-            user.skills.some(userSkill => userSkill.toLowerCase().includes(reqSkill.toLowerCase()) || reqSkill.toLowerCase().includes(userSkill.toLowerCase()))
-          );
-          
           return (
             <div 
               key={job._id}
-              className="glass-panel rounded-3xl p-6 shadow-sm flex flex-col justify-between"
+              className="glass-panel rounded-3xl p-6 shadow-sm flex flex-col justify-between border border-slate-200/40 dark:border-slate-850"
             >
               <div>
                 <div className="flex justify-between items-start">
@@ -134,7 +130,7 @@ const PlacementPortal = () => {
                 {/* Requirements list */}
                 <div className="mt-5 space-y-2">
                   <span className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest block">Requirements</span>
-                  <ul className="grid grid-cols-1 md:grid-cols-2 gap-x-4 gap-y-1.5 text-xs text-slate-500">
+                  <ul className="grid grid-cols-1 md:grid-cols-2 gap-x-4 gap-y-1.5 text-xs text-slate-550">
                     {job.requirements.map((req, i) => (
                       <li key={i} className="flex items-center gap-1.5 truncate">
                         <span className="h-1 w-1 bg-slate-400 rounded-full shrink-0" />
@@ -143,19 +139,6 @@ const PlacementPortal = () => {
                     ))}
                   </ul>
                 </div>
-
-                {/* Match Rate (Skills Check) */}
-                {user.skills.length > 0 && (
-                  <div className="mt-5 p-3 rounded-2xl bg-indigo-500/5 dark:bg-indigo-950/20 border border-indigo-500/10 flex justify-between items-center">
-                    <div className="flex items-center gap-2">
-                      <Award className="h-4 w-4 text-indigo-500" />
-                      <span className="text-xs font-bold text-slate-700 dark:text-slate-355">Profile Match:</span>
-                    </div>
-                    <span className="text-xs font-extrabold text-indigo-600 dark:text-indigo-400">
-                      {matchedSkills.length} / {job.requirements.length} Skills Match
-                    </span>
-                  </div>
-                )}
               </div>
 
               {/* Apply Action buttons */}

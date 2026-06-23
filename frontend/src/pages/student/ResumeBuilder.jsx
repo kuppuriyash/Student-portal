@@ -1,11 +1,10 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { FileText, Printer, HelpCircle, Edit } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 const ResumeBuilder = () => {
   const { user } = useAuth();
-  const [template, setTemplate] = useState('modern'); // 'modern' or 'classic'
 
   const handlePrint = () => {
     window.print();
@@ -32,27 +31,14 @@ const ResumeBuilder = () => {
           </p>
         </div>
 
-        <div className="flex items-center gap-3">
-          {/* Template select */}
-          <select
-            value={template}
-            onChange={(e) => setTemplate(e.target.value)}
-            className="rounded-2xl border border-slate-200/60 bg-white/60 px-4 py-2.5 text-xs font-semibold outline-none focus:border-indigo-500 dark:border-slate-800/60 dark:bg-slate-900/50 dark:text-slate-100 cursor-pointer"
-          >
-            <option value="modern">Modern Professional</option>
-            <option value="classic">Classic Academic</option>
-          </select>
-
-          {/* Print Trigger */}
-          <button
-            onClick={handlePrint}
-            disabled={!hasPortfolioData}
-            className="flex items-center gap-1.5 rounded-2xl bg-indigo-600 hover:bg-indigo-700 text-white px-5 py-2.5 text-xs font-semibold shadow-lg shadow-indigo-600/25 transition-all disabled:opacity-50 cursor-pointer"
-          >
-            <Printer className="h-4 w-4" />
-            Print / Save PDF
-          </button>
-        </div>
+        <button
+          onClick={handlePrint}
+          disabled={!hasPortfolioData}
+          className="flex items-center gap-1.5 rounded-2xl bg-indigo-600 hover:bg-indigo-700 text-white px-5 py-2.5 text-xs font-semibold shadow-lg shadow-indigo-600/25 transition-all disabled:opacity-50 cursor-pointer"
+        >
+          <Printer className="h-4 w-4" />
+          Print / Save PDF
+        </button>
       </div>
 
       {/* Warning banner when portfolio details are empty (Hidden on print) */}
@@ -104,9 +90,7 @@ const ResumeBuilder = () => {
 
       {/* Resume Document Layout (Printable Sheet) */}
       <div className="flex justify-center">
-        <div className={`print-container w-full max-w-[800px] min-h-[1050px] bg-white text-slate-800 p-12 shadow-xl border border-slate-200/50 rounded-[32px] dark:border-slate-800/50 dark:bg-white dark:text-slate-800 transition-all ${
-          template === 'classic' ? 'font-serif' : 'font-sans'
-        }`}>
+        <div className="print-container w-full max-w-[800px] min-h-[1050px] bg-white text-slate-800 p-12 shadow-xl border border-slate-200/50 rounded-[32px] dark:border-slate-805 dark:bg-white dark:text-slate-800 transition-all font-sans">
           {/* Header Contact Block */}
           <div className="text-center border-b-[2px] border-slate-200 pb-6 mb-8">
             <h2 className="text-3xl font-extrabold text-slate-900 tracking-tight">{user.name}</h2>
@@ -133,7 +117,7 @@ const ResumeBuilder = () => {
                   {user.education.map((edu, i) => (
                     <div key={i} className="flex justify-between items-start text-sm">
                       <div>
-                        <h4 className="font-bold text-slate-950">{edu.institution}</h4>
+                        <h4 className="font-bold text-slate-955">{edu.institution}</h4>
                         <p className="text-xs text-slate-500 font-medium">{edu.degree}</p>
                       </div>
                       <div className="text-right">
@@ -157,7 +141,7 @@ const ResumeBuilder = () => {
                     <div key={i} className="space-y-1">
                       <div className="flex justify-between items-start text-sm">
                         <div>
-                          <h4 className="font-bold text-slate-950">{exp.company}</h4>
+                          <h4 className="font-bold text-slate-955">{exp.company}</h4>
                           <p className="text-xs text-slate-500 font-medium">{exp.role}</p>
                         </div>
                         <span className="text-xs font-bold text-slate-900">{exp.duration}</span>
@@ -179,8 +163,8 @@ const ResumeBuilder = () => {
                   {user.projects.map((proj, i) => (
                     <div key={i} className="space-y-1 text-sm">
                       <div className="flex justify-between items-start">
-                        <h4 className="font-bold text-slate-950">{proj.title}</h4>
-                        {proj.link && <span className="text-xs text-indigo-600 font-semibold">{proj.link}</span>}
+                        <h4 className="font-bold text-slate-955">{proj.title}</h4>
+                        {proj.link && <span className="text-xs text-indigo-650 font-semibold">{proj.link}</span>}
                       </div>
                       <p className="text-xs text-slate-500 font-bold">Tech Stack: {proj.technologies}</p>
                       <p className="text-xs text-slate-650 leading-relaxed pl-2">{proj.description}</p>
